@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="sk" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bazárik.sk — Moderná a bezpečná občianska inzercia (Bazoš 2.0)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .badge-verified { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col font-sans text-slate-800 antialiased bg-slate-50">
+
+  <!-- 1. TOP SAFETY BANNER (Anti-phishing announcement) -->
+  <header class="bg-emerald-700 text-white text-xs md:text-sm py-2 px-4 shadow-sm">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="flex h-2 w-2 rounded-full bg-emerald-300 animate-pulse"></span>
+        <span class="font-medium flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-200 inline"></i>
+          <strong>Bezpečný Bazárik:</strong> Ochrana pred phishingom, chránený in-app chat, SMS overení predajcovia.
+        </span>
+      </div>
+      <div class="flex items-center space-x-4 text-emerald-100 text-xs">
+        <span class="hidden sm:inline flex items-center gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> SMS overení predajcovia</span>
+        <span class="hidden md:inline flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> GPS rádius v km</span>
+        <button onclick="openSafetyModal()" class="underline hover:text-white font-medium cursor-pointer">Ako chránime vaše nákupy?</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. MAIN NAVBAR -->
+  <nav class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20 gap-4">
+        
+        <!-- Logo -->
+        <div class="flex items-center space-x-3 cursor-pointer shrink-0" onclick="navigateTo('home')">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+            <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-2xl font-black tracking-tight text-slate-900">Bazárik<span class="text-blue-600">.sk</span></span>
+              <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">Bazoš 2.0</span>
+            </div>
+            <p class="text-[11px] text-slate-500 hidden sm:block">Moderná a bezpečná občianska inzercia</p>
+          </div>
+        </div>
+
+        <!-- Global Search Bar & GPS Selector -->
+        <div class="hidden md:flex flex-1 max-w-2xl items-center relative">
+          <div class="flex w-full items-center border-2 border-slate-200 rounded-xl overflow-hidden focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-100 transition-all bg-slate-50 hover:bg-white">
+            
+            <!-- Category dropdown within search -->
+            <select id="search-cat" onchange="filterByCategory(this.value)" class="bg-transparent text-xs text-slate-600 border-r border-slate-200 py-3 pl-3 pr-2 font-medium focus:outline-none cursor-pointer hidden lg:block">
+              <option value="all">Všetky kategórie</option>
+              <option value="Deti a bábätká">Deti a bábätká</option>
+              <option value="Dom a bývanie">Dom a bývanie</option>
+              <option value="Elektronika">Elektronika a PC</option>
+              <option value="Šport a voľný čas">Šport a voľný čas</option>
+              <option value="Darujem za odvoz">Darujem za odvoz (0 €)</option>
+            </select>
+            
+            <!-- Input -->
+            <div class="relative flex-1 flex items-center">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none"></i>
+              <input id="main-search-input" type="text" placeholder="Hľadať kočík Cybex, písací stôl, iPhone 13, bicykel..." 
+                     oninput="handleSearch(this.value)"
+                     class="w-full py-2.5 pl-9 pr-3 text-sm bg-transparent placeholder-slate-400 text-slate-800 focus:outline-none">
+            </div>
+
+            <!-- GPS Radius Selector Pill -->
+            <div class="relative border-l border-slate-200 bg-white shrink-0">
+              <button onclick="toggleGpsDropdown()" type="button" class="flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-blue-600"></i>
+                <span id="selected-location-text">Mlynská dolina +5 km</span>
+                <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
+              </button>
+
+              <!-- GPS Dropdown Menu -->
+              <div id="gps-dropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-50 text-left">
+                <div class="text-xs font-bold text-slate-800 mb-2 flex items-center gap-1">
+                  <i data-lucide="navigation" class="w-3.5 h-3.5 text-blue-600"></i> Nastaviť GPS polohu a okruh
+                </div>
+                <div class="space-y-1 text-xs">
+                  <button onclick="setLocation('Mlynská dolina', 2)" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-blue-50 hover:text-blue-700 flex justify-between">
+                    <span>Mlynská dolina (internáty)</span>
+                    <span class="text-slate-400 font-medium">+2 km</span>
+                  </button>
+                  <button onclick="setLocation('Mlynská dolina', 5)" class="w-full text-left px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 font-semibold flex justify-between">
+                    <span>Mlynská dolina + okolie</span>
+                    <span class="text-blue-600">+5 km</span>
+                  </button>
+                  <button onclick="setLocation('Bratislava - celé mesto', 15)" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-blue-50 hover:text-blue-700 flex justify-between">
+                    <span>Celá Bratislava</span>
+                    <span class="text-slate-400 font-medium">+15 km</span>
+                  </button>
+                  <button onclick="setLocation('Žilina a okolie', 10)" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-blue-50 hover:text-blue-700 flex justify-between">
+                    <span>Žilina a okolie (Hliny/Solinky)</span>
+                    <span class="text-slate-400 font-medium">+10 km</span>
+                  </button>
+                  <button onclick="setLocation('Celé Slovensko', 0)" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-blue-50 hover:text-blue-700 flex justify-between border-t border-slate-100 pt-1">
+                    <span>Celé Slovensko</span>
+                    <span class="text-slate-400 font-medium">SR</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Search Action Button -->
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 text-sm font-semibold transition-colors flex items-center gap-1">
+              <span>Hľadať</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- User Actions (Favorites, Messages, Profile, Post CTA) -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          
+          <!-- Favorites -->
+          <button title="Uložené inzeráty" class="p-2.5 text-slate-600 hover:text-red-500 hover:bg-slate-100 rounded-xl transition relative">
+            <i data-lucide="heart" class="w-5 h-5"></i>
+            <span class="absolute top-1.5 right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">3</span>
+          </button>
+
+          <!-- Messages (In-App Chat indicator) -->
+          <button onclick="openChatModal('cybex')" title="Správy a in-app chat" class="p-2.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-xl transition relative">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+            <span class="absolute top-1.5 right-1.5 bg-blue-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
+          </button>
+
+          <!-- User Profile / My Listings -->
+          <div class="hidden sm:flex items-center space-x-2 pl-1 pr-2 py-1 rounded-xl hover:bg-slate-100 cursor-pointer border border-transparent hover:border-slate-200 transition">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-slate-700 to-slate-900 text-white flex items-center justify-center font-bold text-xs">
+              SK
+            </div>
+            <div class="text-left leading-tight hidden lg:block">
+              <p class="text-xs font-bold text-slate-800">Moje inzeráty</p>
+              <p class="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">
+                <i data-lucide="shield-check" class="w-3 h-3 inline"></i> SMS Overený
+              </p>
+            </div>
+          </div>
+
+          <!-- Add Listing CTA -->
+          <button onclick="alert('Otvára sa mobilný sprievodca pridania inzerátu (3 kroky, do 2 minút bez zverejnenia tel. čísla).')" 
+                  class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md shadow-blue-500/25 flex items-center gap-1.5 transition-all transform hover:-translate-y-0.5">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">+ Pridať inzerát</span>
+            <span class="sm:hidden">+ Pridať</span>
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Search Bar (< md screens) -->
+    <div class="md:hidden px-4 pb-3">
+      <div class="relative flex items-center border border-slate-300 rounded-xl bg-slate-50 overflow-hidden">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3"></i>
+        <input type="text" placeholder="Hľadať kočík, stôl, bicykel..." oninput="handleSearch(this.value)" class="w-full py-2 pl-9 pr-3 text-sm bg-transparent focus:outline-none">
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== VIEW 1: HOMEPAGE ==================== -->
+  <main id="view-home" class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+
+    <!-- Quick Filter Pills / IA Facet Chips -->
+    <section class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> Rýchle filtre a inteligentný výber
+        </h2>
+        <span class="text-xs text-slate-500">Zobrazujem: <strong id="result-count-text" class="text-slate-800">12 aktívnych inzerátov</strong></span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2" id="quick-filter-container">
+        <button onclick="toggleFilter('gps')" id="btn-filter-gps" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 bg-blue-50 text-blue-700 border-blue-300 shadow-sm">
+          <i data-lucide="navigation" class="w-3.5 h-3.5 text-blue-600"></i>
+          <span>📍 V mojom okolí (GPS okruh 5 km)</span>
+        </button>
+
+        <button onclick="toggleFilter('darujem')" id="btn-filter-darujem" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50 shadow-sm">
+          <span class="text-sm">🎁</span>
+          <span>Darujem za odvoz (0 €)</span>
+        </button>
+
+        <button onclick="toggleFilter('overeni')" id="btn-filter-overeni" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 bg-white text-slate-700 border-slate-200 hover:bg-slate-50">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>⭐ Overení predajcovia (SMS / BankID)</span>
+        </button>
+
+        <button onclick="toggleFilter('kurier')" id="btn-filter-kurier" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 bg-white text-slate-700 border-slate-200 hover:bg-slate-50">
+          <i data-lucide="truck" class="w-3.5 h-3.5 text-indigo-600"></i>
+          <span>🚚 S odvozom / kuriérom</span>
+        </button>
+
+        <button onclick="toggleFilter('nove')" id="btn-filter-nove" class="filter-pill px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all flex items-center gap-1.5 bg-white text-slate-700 border-slate-200 hover:bg-slate-50">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
+          <span>✨ Stav: Ako nový</span>
+        </button>
+
+        <button onclick="resetFilters()" id="btn-reset-filters" class="px-2.5 py-1.5 rounded-full text-xs text-slate-400 hover:text-slate-700 hover:underline ml-auto hidden">
+          Zrušiť filtre ✕
+        </button>
+      </div>
+    </section>
+
+    <!-- 10 Categories Grid (Sitemap / Taxonomy from Uloha 04) -->
+    <section class="mb-8">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-bold tracking-tight text-slate-900 flex items-center gap-2">
+          <i data-lucide="layout-grid" class="w-4 h-4 text-blue-600"></i> 10 Hlavných kategórií portálu
+        </h2>
+        <span class="text-xs text-blue-600 font-semibold hover:underline cursor-pointer">Zobraziť všetkých 80 podkategórií →</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+        <!-- Cat 1: Auto-moto -->
+        <div onclick="filterByCategory('Auto-moto')" class="cat-card bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="car" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Auto-moto</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Autá, moto, diely</p>
+        </div>
+
+        <!-- Cat 2: Reality a bývanie / Dom a záhrada -->
+        <div onclick="filterByCategory('Dom a bývanie')" class="cat-card bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="home" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Reality a bývanie</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Nábytok, dom, záhrada</p>
+        </div>
+
+        <!-- Cat 3: Elektronika a PC -->
+        <div onclick="filterByCategory('Elektronika')" class="cat-card bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="smartphone" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Elektronika a PC</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Mobily, PC, konzoly</p>
+        </div>
+
+        <!-- Cat 4: Deti a bábätká -->
+        <div onclick="filterByCategory('Deti a bábätká')" class="cat-card bg-white p-3.5 rounded-2xl border-2 border-pink-200 hover:border-pink-500 hover:shadow-md transition-all cursor-pointer group bg-pink-50/20">
+          <div class="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="baby" class="w-5 h-5"></i>
+          </div>
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-slate-900 group-hover:text-pink-600 transition-colors">Deti a bábätká</h3>
+            <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-0.5">Kočíky, autosedačky</p>
+        </div>
+
+        <!-- Cat 5: Šport a voľný čas -->
+        <div onclick="filterByCategory('Šport a voľný čas')" class="cat-card bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="bike" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Šport a voľný čas</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Bicykle, lyže, fitness</p>
+        </div>
+
+        <!-- Cat 6: Oblečenie a obuv -->
+        <div onclick="filterByCategory('Oblečenie')" class="cat-card bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="shirt" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Oblečenie a obuv</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Dámske, pánske, deti</p>
+        </div>
+
+        <!-- Cat 7: Dom a záhrada / Stroje a priemysel -->
+        <div onclick="filterByCategory('Knihy a hudba')" class="cat-card bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Knihy a zberateľstvo</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Učebnice, nástroje, LP</p>
+        </div>
+
+        <!-- Cat 8: Zvieratá -->
+        <div onclick="filterByCategory('Zvieratá')" class="cat-card bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="dog" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Zvieratá</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Psy, mačky, chovateľstvo</p>
+        </div>
+
+        <!-- Cat 9: Služby a remeslá -->
+        <div onclick="filterByCategory('Služby')" class="cat-card bg-white p-3.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+            <i data-lucide="wrench" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">Služby a remeslá</h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Sťahovanie, majstri</p>
+        </div>
+
+        <!-- Cat 10: Darujem za odvoz (Circular economy) -->
+        <div onclick="filterByCategory('Darujem za odvoz')" class="cat-card bg-emerald-50/70 p-3.5 rounded-2xl border-2 border-emerald-300 hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform font-bold text-lg">
+            🎁
+          </div>
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-emerald-900 group-hover:text-emerald-700 transition-colors">Darujem za odvoz</h3>
+            <span class="text-[10px] bg-emerald-200 text-emerald-900 font-bold px-1.5 py-0.2 rounded">0 €</span>
+          </div>
+          <p class="text-[11px] text-emerald-700/80 mt-0.5">Udržateľnosť a recyklácia</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Persona Matching Notice Banner (Tomáš & Zuzana) -->
+    <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-emerald-50 border border-blue-200 rounded-2xl p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 font-bold text-sm shadow-sm">
+          IA
+        </div>
+        <div>
+          <p class="text-xs font-bold text-slate-900">Navrhnuté podľa persón z Informačnej architektúry (Úloha 04):</p>
+          <p class="text-xs text-slate-600">
+            <strong>Tomáš (študent FMFI UK)</strong> hľadá stôl za odvoz v Mlynskej doline (+5 km). 
+            <strong>Zuzana (mama a učiteľka zo Žiliny)</strong> predáva kočík Cybex cez chránený in-app chat bez rizika podvodníkov.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="navigateTo('detail-stol')" class="text-xs font-semibold bg-white text-blue-700 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-xl transition cursor-pointer">
+          Písací stôl za odvoz (Tomáš)
+        </button>
+        <button onclick="navigateTo('detail-cybex')" class="text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 px-3 py-1.5 rounded-xl shadow-sm transition cursor-pointer">
+          Kočík Cybex Priam (Zuzana)
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Listings Grid (12 Items) -->
+    <section>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <h2 class="text-lg font-bold text-slate-900">Aktuálne inzeráty v okolí</h2>
+          <span class="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">Triedenie: Odporúčané podľa lokality</span>
+        </div>
+        <div class="flex items-center space-x-2 text-xs text-slate-500">
+          <span>Zoradiť:</span>
+          <select id="sort-select" onchange="handleSort(this.value)" class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-700 font-medium focus:outline-none">
+            <option value="recommended">Najbližšie k Mlynskej doline</option>
+            <option value="cheapest">Najlacnejšie (vrátane 0 €)</option>
+            <option value="newest">Najnovšie pridané</option>
+            <option value="rating">Podľa hodnotenia predajcu</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Listings Grid Container -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="listings-grid">
+        
+        <!-- CARD 1: Cybex Priam (Zuzana M.) -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Deti a bábätká" data-price="450" data-city="Žilina" data-verified="true" data-condition="Ako nový" data-title="Kombinovaný kočík Cybex Priam 3v1">
+          <div class="relative h-48 bg-gradient-to-br from-pink-50 via-slate-100 to-rose-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-pink-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="baby" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">Fotogaléria (8 fotiek)</span>
+            </div>
+            <!-- Badges -->
+            <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-lg shadow-sm flex items-center gap-1">
+              <i data-lucide="sparkles" class="w-3 h-3 text-amber-500"></i> Ako nový
+            </span>
+            <span class="absolute top-3 right-3 badge-verified text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm flex items-center gap-0.5">
+              <i data-lucide="shield-check" class="w-3 h-3"></i> SMS Overená
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Deti a bábätká › Kočíky</span>
+                <span class="text-emerald-700 font-semibold">Pred 2 hodinami</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Kombinovaný kočík Cybex Priam 3v1 (Rose Gold / Deep Black)
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Kompletná výbava po 1 dieťati, hlboká vanička, športová časť aj vajíčko. Bez škrabancov, nefajčiarska domácnosť.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Značka: Cybex</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Model: Priam 3v1</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Osobný odber Žilina</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">450 €</span>
+                <span class="text-[10px] text-slate-400 block">Dohoda možná</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Zuzana M.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 5.0</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Žilina - Hliny
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: Písací stôl z masívu za odvoz (Tomáš's target) -->
+        <div onclick="navigateTo('detail-stol')" class="listing-card bg-white rounded-2xl border-2 border-emerald-300 hover:border-emerald-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Dom a bývanie" data-price="0" data-city="Bratislava" data-verified="true" data-condition="Veľmi dobrý" data-title="Písací stôl z masívu za odvoz">
+          <div class="relative h-48 bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="archive" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">4 fotografie</span>
+            </div>
+            <!-- Zero Price Banner -->
+            <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg shadow-sm flex items-center gap-1">
+              🎁 DARUJEM ZA ODVOZ (0 €)
+            </span>
+            <span class="absolute top-3 right-3 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm flex items-center gap-0.5">
+              📍 1.2 km od teba
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Dom a bývanie › Nábytok</span>
+                <span class="text-slate-500">Dnes 14:15</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-2 leading-snug mb-1">
+                Písací stôl z masívu so zásuvkami (Darujem za odvoz)
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Pevný borovicový stôl 120x60x75 cm. Možnosť demontáže nôh pre ľahký presun. Prízemie pri vchode, ideálne pre študenta.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-emerald-50 text-emerald-700 font-medium px-2 py-0.5 rounded">120 x 60 x 75 cm</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Dá sa rozložiť: Áno</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Prízemie</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-xl font-black text-emerald-600">0 €</span>
+                <span class="text-[10px] text-emerald-700 font-bold block">Zadarmo za odvoz</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Peter K.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 4.9</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-emerald-600"></i> Mlynská dolina (1.2 km)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3: iPhone 13 Pro -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Elektronika" data-price="480" data-city="Bratislava" data-verified="true" data-condition="Výborný" data-title="Apple iPhone 13 Pro 128GB">
+          <div class="relative h-48 bg-gradient-to-br from-slate-100 via-sky-50 to-blue-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-blue-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="smartphone" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">6 fotografií</span>
+            </div>
+            <span class="absolute top-3 left-3 bg-white/95 text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+              🔋 Batéria 88 %
+            </span>
+            <span class="absolute top-3 right-3 badge-verified text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm flex items-center gap-0.5">
+              <i data-lucide="shield-check" class="w-3 h-3"></i> Overený
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Elektronika › Mobily</span>
+                <span class="text-slate-500">Včera</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Apple iPhone 13 Pro 128GB Sierra Blue (Kompletné balenie)
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Nosený v ochrannom púzdre, bez jediného škrabanca. Kábel a krabička. Odhlásený z iCloud.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">128 GB</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Batéria 88%</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Záruka 3 mes.</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">480 €</span>
+                <span class="text-[10px] text-slate-400 block">Pevná cena</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Martin S.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 5.0</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Bratislava - Ružinov (4.5 km)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 4: Trek Marlin 7 -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Šport a voľný čas" data-price="520" data-city="Žilina" data-verified="true" data-condition="Výborný" data-title="Horský bicykel Trek Marlin 7">
+          <div class="relative h-48 bg-gradient-to-br from-emerald-50 via-slate-100 to-lime-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="bike" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">5 fotografií</span>
+            </div>
+            <span class="absolute top-3 left-3 bg-white/95 text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+              Rám: L (29" kolesá)
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Šport › Horský bicykel</span>
+                <span class="text-slate-500">Pred 1 dňom</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Horský bicykel Trek Marlin 7 (Veľkosť rámu L, 29")
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Hydraulické kotúčové brzdy Shimano, vzduchová vidlica RockShox. Pravidelný servis, minimálne jazdený.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Rám L</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Shimano Deore 1x10</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Osobný odber</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">520 €</span>
+                <span class="text-[10px] text-slate-400 block">Pôvodne 850 €</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Michal B.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 4.8</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Žilina - Solinky
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 5: Autosedačka Maxi-Cosi -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Deti a bábätká" data-price="85" data-city="Žilina" data-verified="true" data-condition="Ako nový" data-title="Detská autosedačka Maxi-Cosi CabrioFix">
+          <div class="relative h-48 bg-gradient-to-br from-pink-50 via-purple-50 to-slate-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-pink-500 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="shield" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">3 fotografie</span>
+            </div>
+            <span class="absolute top-3 left-3 bg-white/95 text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+              IsoFix báza v cene
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Deti a bábätká › Autosedačky</span>
+                <span class="text-slate-500">Pred 3 dňami</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Autosedačka Maxi-Cosi CabrioFix + EasyFix báza (0-13 kg)
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Z nehavarovaného auta, vypratý poťah, novorodenecká vložka, slnečná strieška.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">0-13 kg</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">IsoFix / Pásy</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Kuriér možný</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">85 €</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Veronika P.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 5.0</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Žilina - Vlčince
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 6: Herman Miller Mirra 2 -->
+        <div onclick="navigateTo('detail-stol')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Dom a bývanie" data-price="390" data-city="Bratislava" data-verified="true" data-condition="Veľmi dobrý" data-title="Ergonomická stolička Herman Miller Mirra 2">
+          <div class="relative h-48 bg-gradient-to-br from-slate-100 via-indigo-50 to-slate-200 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-slate-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="armchair" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">4 fotografie</span>
+            </div>
+            <span class="absolute top-3 left-3 bg-white/95 text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+              Nastaviteľná bedrová opierka
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Dom a bývanie › Kancelária</span>
+                <span class="text-slate-500">Pred 2 dňami</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Ergonomická kancelárska stolička Herman Miller Mirra 2
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Plne nastaviteľná, sieťovinový chrbát Butterfly, flexibilné opierky rúk. Ideálna na celodenné programovanie.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Herman Miller</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Plná výbava</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Osobný odber</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">390 €</span>
+                <span class="text-[10px] text-slate-400 block">Pôvodne 1 100 €</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>IT Firma s.r.o.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 4.9</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Staré Mesto (3.2 km)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 7: Sony PS5 -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Elektronika" data-price="410" data-city="Trnava" data-verified="true" data-condition="Ako nový" data-title="Sony PlayStation 5 (2x DualSense + hry)">
+          <div class="relative h-48 bg-gradient-to-br from-blue-900 via-indigo-950 to-slate-900 flex items-center justify-center overflow-hidden text-white">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white/20 backdrop-blur shadow-md text-white flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="gamepad-2" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-white bg-black/40 px-2.5 py-1 rounded-full">Disková verzia (825 GB)</span>
+            </div>
+            <span class="absolute top-3 right-3 badge-verified text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm flex items-center gap-0.5">
+              <i data-lucide="shield-check" class="w-3 h-3"></i> Overený
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Elektronika › Herné konzoly</span>
+                <span class="text-slate-500">Pred 4 hodinami</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Sony PlayStation 5 s mechanikou + 2x ovládač + 3 hry
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Veľmi málo hraná, tichý ventilátor. V cene Spider-Man 2, God of War Ragnarok a Gran Turismo 7.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Disk verzia</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">2 ovládače</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Packeta / Pošta</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">410 €</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Tomáš V.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 4.7</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Trnava (možný dovoz BA)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 8: Zimná bunda Columbia -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Oblečenie" data-price="65" data-city="Banská Bystrica" data-verified="true" data-condition="Nové" data-title="Zimná bunda Columbia Titanium">
+          <div class="relative h-48 bg-gradient-to-br from-rose-50 via-slate-100 to-indigo-50 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-rose-500 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="shirt" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 px-2.5 py-1 rounded-full">Nové s visačkou</span>
+            </div>
+            <span class="absolute top-3 left-3 bg-white/95 text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+              Veľkosť M
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Oblečenie › Pánske bundy</span>
+                <span class="text-slate-500">Pred 5 dňami</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Zimná nepremokavá bunda Columbia Titanium (Veľkosť M)
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Nevhodný dar, membrána Omni-Tech, podlepené švy, odvetrávanie v podpazuší.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Veľkosť M</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Omni-Tech</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Packeta na dobierku</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">65 €</span>
+                <span class="text-[10px] text-slate-400 block">Pôvodne 150 €</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Lucia D.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 5.0</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Banská Bystrica
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 9: Akustická gitara Yamaha -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Knihy a hudba" data-price="95" data-city="Nitra" data-verified="true" data-condition="Veľmi dobrý" data-title="Akustická gitara Yamaha F310">
+          <div class="relative h-48 bg-gradient-to-br from-amber-50 via-orange-50 to-slate-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="music" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 px-2.5 py-1 rounded-full">Príslušenstvo v cene</span>
+            </div>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Knihy a hudba › Nástroje</span>
+                <span class="text-slate-500">Pred 1 dňom</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Akustická gitara Yamaha F310 + polstrované púzdro a ladička
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Ideálna pre začiatočníka aj pokročilého, rovný krk, nové struny D'Addario.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Yamaha F310</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Púzdro v cene</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">95 €</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Andrej M.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 4.9</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Nitra
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 10: Kosačka Stiga -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Dom a bývanie" data-price="190" data-city="Košice" data-verified="true" data-condition="Veľmi dobrý" data-title="Záhradná motorová kosačka Stiga">
+          <div class="relative h-48 bg-gradient-to-br from-lime-50 via-slate-100 to-emerald-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-emerald-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="wrench" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 px-2.5 py-1 rounded-full">Po jarnom servise</span>
+            </div>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Dom a bývanie › Záhrada</span>
+                <span class="text-slate-500">Pred 6 dňami</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Záhradná motorová kosačka Stiga Combi 48 SQ s pojazdom
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Motor Briggs&Stratton, mulčovanie, nový nôž, vymenený olej. Pripravená na sezónu.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Záber 46 cm</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">S pojazdom</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">190 €</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Pavol K.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 4.8</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Košice - Sever
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 11: Border Kólia -->
+        <div onclick="navigateTo('detail-cybex')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Zvieratá" data-price="350" data-city="Trenčín" data-verified="true" data-condition="Nové" data-title="Šteniatko Border kólia s PP">
+          <div class="relative h-48 bg-gradient-to-br from-amber-50 via-stone-100 to-orange-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-amber-700 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="dog" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 px-2.5 py-1 rounded-full">S preukazom pôvodu</span>
+            </div>
+            <span class="absolute top-3 right-3 badge-verified text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm flex items-center gap-0.5">
+              <i data-lucide="shield-check" class="w-3 h-3"></i> Overená stanica
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Zvieratá › Psy a šteniatka</span>
+                <span class="text-slate-500">Pred 2 dňami</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Čistokrvné šteniatko Border kólia (sučka, odčervená, čipovaná)
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Socializovaná v rodinnom prostredí pri deťoch, očkovací preukaz, štartovací balíček krmiva.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">S PP</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Čipované</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">350 €</span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>Chovateľská st.</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 5.0</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Trenčín
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 12: Sťahovanie a autodoprava -->
+        <div onclick="navigateTo('detail-stol')" class="listing-card bg-white rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col overflow-hidden group" data-category="Služby" data-price="25" data-city="Bratislava" data-verified="true" data-condition="Výborný" data-title="Sťahovanie a autodoprava Mercedes Sprinter">
+          <div class="relative h-48 bg-gradient-to-br from-indigo-50 via-slate-100 to-sky-100 flex items-center justify-center overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white shadow-md text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i data-lucide="truck" class="w-8 h-8"></i>
+              </div>
+              <span class="text-xs font-bold text-slate-700 bg-white/90 px-2.5 py-1 rounded-full">Dodávka + 2 šoféri</span>
+            </div>
+            <span class="absolute top-3 left-3 bg-white/95 text-slate-800 text-[11px] font-bold px-2 py-0.5 rounded-lg shadow-sm">
+              Odvoz nábytku z Mlynskej doliny
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>Služby › Sťahovanie a doprava</span>
+                <span class="text-slate-500">Dnes 09:30</span>
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug mb-1">
+                Sťahovanie bytov a študentských izieb dodávkou po Bratislave
+              </h3>
+              <p class="text-xs text-slate-500 line-clamp-2 mb-3">
+                Rýchly odvoz nábytku, elektrospotrebičov, vynesenie na poschodie. Študentská zľava pre Mlynskú dolinu.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-3 text-[10px] text-slate-600">
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Od 25 € / hod</span>
+              <span class="bg-slate-100 px-2 py-0.5 rounded">Bratislava a okolie</span>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-lg font-black text-slate-900">25 € <span class="text-xs font-normal text-slate-400">/ hod</span></span>
+              </div>
+              <div class="text-right">
+                <div class="flex items-center justify-end gap-1 text-xs font-semibold text-slate-800">
+                  <span>RýchloTrans</span>
+                  <span class="text-amber-500 font-bold flex items-center text-[11px]">★ 4.9</span>
+                </div>
+                <span class="text-[11px] text-slate-500 flex items-center justify-end gap-0.5">
+                  <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i> Mlynská dolina & BA
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ==================== VIEW 2: SUBPAGE DETAIL - CYBEX PRIAM (Zuzana M.) ==================== -->
+  <main id="view-detail-cybex" class="hidden flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+
+    <!-- Breadcrumb & Back button -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <nav class="flex items-center space-x-2 text-xs text-slate-500">
+        <button onclick="navigateTo('home')" class="hover:text-blue-600 flex items-center gap-1 font-medium cursor-pointer">
+          <i data-lucide="home" class="w-3.5 h-3.5"></i> Domov
+        </button>
+        <span>›</span>
+        <span class="hover:text-blue-600 cursor-pointer" onclick="filterByCategory('Deti a bábätká'); navigateTo('home')">Deti a bábätká</span>
+        <span>›</span>
+        <span class="hover:text-blue-600 cursor-pointer" onclick="navigateTo('home')">Kočíky a príslušenstvo</span>
+        <span>›</span>
+        <span class="text-slate-800 font-semibold truncate max-w-[200px] sm:max-w-none">Cybex Priam 3v1</span>
+      </nav>
+
+      <button onclick="navigateTo('home')" class="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 px-3.5 py-1.5 rounded-xl transition shadow-sm cursor-pointer">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Späť na ponuku inzerátov
+      </button>
+    </div>
+
+    <!-- Main 2-Column Detail Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- LEFT COLUMN: Gallery, Description, Safety Notice, Map (7 cols) -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Main Image Stage -->
+        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="relative h-80 sm:h-96 bg-gradient-to-br from-pink-50 via-slate-50 to-rose-100 flex items-center justify-center p-6">
+            <div class="text-center">
+              <div class="w-24 h-24 mx-auto rounded-3xl bg-white shadow-xl text-pink-600 flex items-center justify-center mb-3">
+                <i data-lucide="baby" class="w-12 h-12"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800">Cybex Priam 3v1 (Rose Gold Chassis)</h3>
+              <p class="text-xs text-slate-500">Fotografia 1 z 8 • Detailný stav podvozku a vaničky</p>
+            </div>
+
+            <!-- Image Badges -->
+            <div class="absolute top-4 left-4 flex gap-2">
+              <span class="badge-verified text-white text-xs font-bold px-3 py-1 rounded-xl shadow-md flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> SMS Overený inzerát
+              </span>
+              <span class="bg-white/95 text-slate-800 text-xs font-bold px-2.5 py-1 rounded-xl shadow-md">
+                Stav: Ako nový
+              </span>
+            </div>
+            <div class="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-xl font-medium flex items-center gap-1.5">
+              <i data-lucide="camera" class="w-3.5 h-3.5"></i> Zobraziť galériu (8 fotiek)
+            </div>
+          </div>
+
+          <!-- Thumbnail Strip -->
+          <div class="grid grid-cols-4 gap-2 p-3 bg-slate-50 border-t border-slate-100">
+            <div class="h-16 bg-white rounded-xl border-2 border-blue-600 flex items-center justify-center cursor-pointer shadow-sm">
+              <span class="text-[11px] font-bold text-blue-700">1. Vanička</span>
+            </div>
+            <div class="h-16 bg-white rounded-xl border border-slate-200 hover:border-slate-400 flex items-center justify-center cursor-pointer">
+              <span class="text-[11px] font-semibold text-slate-600">2. Športová časť</span>
+            </div>
+            <div class="h-16 bg-white rounded-xl border border-slate-200 hover:border-slate-400 flex items-center justify-center cursor-pointer">
+              <span class="text-[11px] font-semibold text-slate-600">3. Vajíčko</span>
+            </div>
+            <div class="h-16 bg-white rounded-xl border border-slate-200 hover:border-slate-400 flex items-center justify-center cursor-pointer">
+              <span class="text-[11px] font-semibold text-slate-600">+5 ďalších</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anti-Phishing Safety Callout -->
+        <div class="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-4 text-emerald-950 flex items-start gap-3.5 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+            <i data-lucide="shield-alert" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-900 mb-0.5">
+              Bezpečnostné upozornenie Bazárika — Prevencia podvodov
+            </h4>
+            <p class="text-xs text-emerald-800 leading-relaxed">
+              Predajkyňa <strong>Zuzana M.</strong> je SMS & BankID overená používateľka. Komunikujte výhradne cez náš 
+              <strong>chránený in-app chat</strong>. Nikdy neklikajte na WhatsApp odkazy požadujúce údaje vašej platobnej karty pod zámienkou platby kuriérom (Packeta, Pošta)!
+            </p>
+          </div>
+        </div>
+
+        <!-- Structured Description -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+            <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i> Popis inzerátu od predávajúcej
+          </h3>
+
+          <div class="text-sm text-slate-700 space-y-3 leading-relaxed">
+            <p>
+              Predávame náš kombinovaný kočík <strong>Cybex Priam 3v1</strong> s luxusným podvozkom v prevedení <strong>Rose Gold</strong> a poťahmi <strong>Deep Black</strong>. Syn už z kočíka vyrástol a chodí samostatne, radi ho posunieme ďalšej rodinke.
+            </p>
+            <p>
+              Kočík bol kupovaný v autorizovanej predajni v roku 2022 a používaný približne 14 mesiacov (hlboká vanička cca 6 mesiacov, športová časť 8 mesiacov). Celý čas bol parkovaný výhradne v byte, nie v chladnej kočikárni.
+            </p>
+            
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+              <p class="font-bold text-xs uppercase tracking-wider text-slate-600">V cene je zahrnutá kompletná výbava 3v1:</p>
+              <ul class="list-disc list-inside text-xs text-slate-700 space-y-1">
+                <li>Podvozok Cybex Priam Rose Gold s odpružením všetkých kolies a nákupným košíkom</li>
+                <li>Hlboká vanička Lux Carry Cot Deep Black s priedušným matracom a panoramatickým vetraním</li>
+                <li>Športové sedadlo Lux Seat (otočné v smere aj protismere jazdy, polohovanie do úplného ľahu)</li>
+                <li>Detská autosedačka vajíčko Cybex Cloud Z i-Size (polohovateľná do ľahu mimo auta)</li>
+                <li>Originál adaptéry na autosedačku</li>
+                <li>Originál pláštenka do dažďa a sieťka proti hmyzu Cybex</li>
+              </ul>
+            </div>
+
+            <p class="text-xs text-slate-600 italic">
+              Preferujem osobný odber v Žiline (sídlisko Hliny), kde si kočík môžete pokojne vyskúšať a zložiť do auta. V prípade seriózneho a rýchleho jednania možná dohoda na cene.
+            </p>
+          </div>
+        </div>
+
+        <!-- Location & Map Preview -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-4 h-4 text-blue-600"></i> Lokalita odberu tovaru
+            </h3>
+            <span class="text-xs font-semibold text-slate-600">Žilina - sídlisko Hliny</span>
+          </div>
+
+          <div class="h-40 bg-slate-100 rounded-2xl border border-slate-200 flex items-center justify-center relative overflow-hidden">
+            <div class="text-center p-4">
+              <div class="w-10 h-10 mx-auto rounded-full bg-blue-600 text-white flex items-center justify-center mb-1 shadow-md">
+                <i data-lucide="navigation" class="w-5 h-5"></i>
+              </div>
+              <p class="text-xs font-bold text-slate-800">Žilina - Hliny (Okres Žilina)</p>
+              <p class="text-[11px] text-slate-500">Orientačná poloha pre osobný odber • Presná adresa po dohode v chate</p>
+            </div>
+            <div class="absolute bottom-2 right-2 bg-white/90 text-[10px] font-semibold text-slate-600 px-2 py-0.5 rounded shadow-sm">
+              GPS okruh: 10 km od centra Žiliny
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Price, Verified Seller, CTAs, Structured Parameters (5 cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- Primary Action Card (Sticky on desktop) -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-md sticky top-24 space-y-5">
+          
+          <!-- Title & Price Header -->
+          <div>
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>Inzerát č. 2026-BZ-9482</span>
+              <span class="text-slate-500">Zobrazené 142×</span>
+            </div>
+            <h1 class="text-xl font-black text-slate-900 leading-snug">
+              Kombinovaný kočík Cybex Priam 3v1
+            </h1>
+            <p class="text-xs text-slate-500 mt-0.5">Podvozok Rose Gold + poťah Deep Black</p>
+
+            <div class="mt-3 flex items-baseline justify-between">
+              <div>
+                <span class="text-3xl font-black text-blue-600">450 €</span>
+                <span class="text-xs text-slate-500 ml-1.5 font-medium">(možná dohoda)</span>
+              </div>
+              <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-xl flex items-center gap-1">
+                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-700"></i> Aktívna ponuka
+              </span>
+            </div>
+          </div>
+
+          <!-- Seller Reputation Card (Persóna Zuzana) -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 to-indigo-600 text-white font-black text-base flex items-center justify-center shadow-md">
+                ZM
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    Zuzana M.
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600" title="Overená totožnosť"></i>
+                  </h4>
+                  <span class="text-xs font-black text-amber-500 flex items-center gap-0.5">
+                    ★ 5.0 <span class="text-slate-400 font-normal">(28 hodnotení)</span>
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500">Učiteľka ZŠ • Žilina</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-2 border-t border-slate-200">
+              <div>
+                <span class="text-slate-400 block">Členom:</span>
+                <span class="font-semibold text-slate-800">Od apríla 2023</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block">Reakčná doba:</span>
+                <span class="font-semibold text-emerald-700">Do 15 minút (Online)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTAs: In-App Protected Chat & Shielded Phone -->
+          <div class="space-y-2.5 pt-1">
+            <!-- Primary Action: In-App Chat Modal -->
+            <button onclick="openChatModal('cybex')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 px-4 rounded-2xl font-bold text-sm shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer">
+              <i data-lucide="message-square" class="w-5 h-5"></i>
+              <span>✉ Napísať predajcovi (Chránený chat)</span>
+            </button>
+
+            <!-- Secondary Action: Show Protected Phone -->
+            <button onclick="revealPhone()" id="btn-show-phone" class="w-full bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 py-3 px-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
+              <i data-lucide="phone" class="w-4 h-4 text-slate-400"></i>
+              <span id="phone-text">📞 Zobraziť tel. číslo</span>
+            </button>
+
+            <p class="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1">
+              <i data-lucide="lock" class="w-3 h-3"></i> Číslo je maskované virtuálnou bránou proti phishing botom.
+            </p>
+          </div>
+
+          <!-- Favorite & Share Tools -->
+          <div class="flex items-center justify-between pt-3 border-t border-slate-100 text-xs font-semibold text-slate-600">
+            <button onclick="alert('Inzerát bol uložený do vašich obľúbených.')" class="hover:text-red-500 flex items-center gap-1.5 transition cursor-pointer">
+              <i data-lucide="heart" class="w-4 h-4 text-slate-400"></i> Uložiť inzerát
+            </button>
+            <button onclick="alert('Odkaz na inzerát bol skopírovaný do schránky.')" class="hover:text-blue-600 flex items-center gap-1.5 transition cursor-pointer">
+              <i data-lucide="share-2" class="w-4 h-4 text-slate-400"></i> Zdieľať ponuku
+            </button>
+            <button onclick="alert('Nahlásenie inzerátu bolo odoslané administrátorovi.')" class="text-slate-400 hover:text-slate-600 flex items-center gap-1 transition cursor-pointer">
+              <i data-lucide="flag" class="w-3.5 h-3.5"></i> Nahlásiť
+            </button>
+          </div>
+
+          <!-- Structured Parameters Table (Fasety z Uloha 04) -->
+          <div class="pt-4 border-t border-slate-200">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+              <i data-lucide="list" class="w-3.5 h-3.5 text-blue-600"></i> Štruktúrované parametre inzerátu
+            </h3>
+
+            <div class="divide-y divide-slate-100 text-xs">
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Kategória</span>
+                <span class="font-semibold text-slate-900">Deti a bábätká › Kočíky</span>
+              </div>
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Stav tovaru</span>
+                <span class="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Ako nový</span>
+              </div>
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Značka</span>
+                <span class="font-semibold text-slate-900">Cybex</span>
+              </div>
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Model</span>
+                <span class="font-semibold text-slate-900">Priam</span>
+              </div>
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Farba</span>
+                <span class="font-semibold text-slate-900">Rose Gold (podvozok) / Deep Black</span>
+              </div>
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Rok výroby</span>
+                <span class="font-semibold text-slate-900">2022</span>
+              </div>
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Lokalita</span>
+                <span class="font-semibold text-slate-900">Žilina - Hliny</span>
+              </div>
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Spôsob odberu</span>
+                <span class="font-semibold text-slate-900">Osobný odber</span>
+              </div>
+              <div class="py-2 flex justify-between">
+                <span class="text-slate-500">Príslušenstvo v cene</span>
+                <span class="font-semibold text-slate-900">Pláštenka, adaptéry, moskytiéra</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ==================== VIEW 3: SUBPAGE DETAIL - PÍSACÍ STÔL ZA ODVOZ (Tomáš) ==================== -->
+  <main id="view-detail-stol" class="hidden flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+
+    <!-- Breadcrumb & Back button -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <nav class="flex items-center space-x-2 text-xs text-slate-500">
+        <button onclick="navigateTo('home')" class="hover:text-blue-600 flex items-center gap-1 font-medium cursor-pointer">
+          <i data-lucide="home" class="w-3.5 h-3.5"></i> Domov
+        </button>
+        <span>›</span>
+        <span class="hover:text-blue-600 cursor-pointer" onclick="filterByCategory('Dom a bývanie'); navigateTo('home')">Dom a bývanie</span>
+        <span>›</span>
+        <span class="hover:text-blue-600 cursor-pointer" onclick="filterByCategory('Darujem za odvoz'); navigateTo('home')">Darujem za odvoz</span>
+        <span>›</span>
+        <span class="text-slate-800 font-semibold">Písací stôl z masívu</span>
+      </nav>
+
+      <button onclick="navigateTo('home')" class="flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 px-3.5 py-1.5 rounded-xl transition shadow-sm cursor-pointer">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Späť na ponuku inzerátov
+      </button>
+    </div>
+
+    <!-- Main 2-Column Detail Layout for Table -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- LEFT COLUMN -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="relative h-80 sm:h-96 bg-gradient-to-br from-emerald-50 via-teal-50 to-slate-100 flex items-center justify-center p-6">
+            <div class="text-center">
+              <div class="w-24 h-24 mx-auto rounded-3xl bg-white shadow-xl text-emerald-600 flex items-center justify-center mb-3">
+                <i data-lucide="archive" class="w-12 h-12"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800">Masívny písací stôl so zásuvkami</h3>
+              <p class="text-xs text-slate-500">Fotografia 1 zo 4 • Borovicový masív, zachovalý stav</p>
+            </div>
+            <div class="absolute top-4 left-4">
+              <span class="bg-emerald-600 text-white text-xs font-black px-3 py-1 rounded-xl shadow-md flex items-center gap-1">
+                🎁 DARUJEM ZA ODVOZ (0 €)
+              </span>
+            </div>
+            <div class="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-md flex items-center gap-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> 1.2 km od Mlynskej doliny
+            </div>
+          </div>
+        </div>
+
+        <!-- Tomáš Persona Match Notification -->
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-900 space-y-1">
+          <p class="font-bold flex items-center gap-1.5">
+            <i data-lucide="user-check" class="w-4 h-4 text-blue-600"></i> Ideálny inzerát pre persónu Tomáš (Študent FMFI UK):
+          </p>
+          <p class="text-blue-800">
+            Nulová cena (0 €), lokalita pešo dostupná od internátov v Mlynskej doline (1.2 km), možnosť demontáže nôh na prenos dvomi osobami bez nutnosti dodávky!
+          </p>
+        </div>
+
+        <!-- Description -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Popis ponuky</h3>
+          <p class="text-sm text-slate-700 leading-relaxed">
+            Darujem za odvoz písací stôl z borovicového masívu s tromi vysúvacími zásuvkami a priestorom na počítač. Stôl je pevný a plne funkčný, slúžil v pracovni.
+          </p>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-1">
+            <p><strong>Rozmery:</strong> Šírka 120 cm × Výška 75 cm × Hĺbka 60 cm</p>
+            <p><strong>Demontáž:</strong> Nohy a zásuvkový diel sa dajú ľahko odmontovať (4 skrutky)</p>
+            <p><strong>Poschodie:</strong> Prízemie rodinného domu, auto viete pristaviť priamo pred dvere</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-md sticky top-24 space-y-5">
+          <div>
+            <h1 class="text-xl font-black text-slate-900 leading-snug">Písací stôl z masívu za odvoz</h1>
+            <div class="mt-3 flex items-baseline justify-between">
+              <div>
+                <span class="text-3xl font-black text-emerald-600">0 €</span>
+                <span class="text-xs text-emerald-700 font-bold ml-1.5">(Zadarmo za odvoz)</span>
+              </div>
+              <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-xl">Ihneď k odberu</span>
+            </div>
+          </div>
+
+          <!-- Seller -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 text-white font-bold flex items-center justify-center">PK</div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-900 flex items-center gap-1">Peter K. <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i></h4>
+                <p class="text-xs text-slate-500">Mlynská dolina, Bratislava</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="space-y-2.5">
+            <button onclick="openChatModal('stol')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-2xl font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition cursor-pointer">
+              <i data-lucide="message-square" class="w-5 h-5"></i>
+              <span>Dohodnúť vyzdvihnutie v chate</span>
+            </button>
+          </div>
+
+          <!-- Parameters -->
+          <div class="pt-4 border-t border-slate-200 text-xs space-y-2">
+            <div class="flex justify-between"><span class="text-slate-500">Materiál</span><span class="font-bold text-slate-900">Masívne drevo (Borovica)</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Rozmery</span><span class="font-bold text-slate-900">120 × 75 × 60 cm</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Možnosť rozloženia</span><span class="font-bold text-emerald-700">Áno (4 skrutky)</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Vzdialenosť</span><span class="font-bold text-blue-600">1.2 km od internátov</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- ==================== IN-APP CHAT MODAL (Anti-Phishing Shield) ==================== -->
+  <div id="chat-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full flex flex-col max-h-[92vh] overflow-hidden border border-slate-200">
+      
+      <!-- Chat Header -->
+      <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="relative">
+            <div id="chat-avatar" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+              ZM
+            </div>
+            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h3 id="chat-seller-name" class="text-sm font-bold text-slate-900">Zuzana M.</h3>
+              <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.2 rounded flex items-center gap-0.5">
+                <i data-lucide="shield-check" class="w-3 h-3"></i> Overená
+              </span>
+            </div>
+            <p id="chat-item-title" class="text-xs text-slate-500 truncate max-w-[280px]">Kombinovaný kočík Cybex Priam 3v1 (450 €)</p>
+          </div>
+        </div>
+
+        <button onclick="closeChatModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <!-- Anti-Phishing Security Callout inside chat -->
+      <div class="bg-amber-50 border-b border-amber-200 p-2.5 px-4 text-[11px] text-amber-900 flex items-center gap-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0"></i>
+        <span>
+          <strong>Ochrana pred podvodmi:</strong> Telefónne čísla sú skryté. Nikdy neotvárajte externé odkazy vyžadujúce platobnú kartu (falošná Packeta/Pošta).
+        </span>
+      </div>
+
+      <!-- Messages Stream -->
+      <div id="chat-messages" class="p-4 flex-1 overflow-y-auto space-y-3 bg-slate-50/50 text-xs min-h-[260px]">
+        
+        <!-- System info message -->
+        <div class="text-center my-1">
+          <span class="bg-slate-200/80 text-slate-600 text-[10px] px-3 py-1 rounded-full">
+            Konverzácia k inzerátu začala • Telefónne číslo je skryté pre bezpečnosť
+          </span>
+        </div>
+
+        <!-- Seller Message 1 -->
+        <div class="flex items-start space-x-2 max-w-[85%]">
+          <div class="w-7 h-7 rounded-lg bg-pink-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0">ZM</div>
+          <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 shadow-sm text-slate-800 space-y-1">
+            <p>Dobrý deň! Ďakujem za záujem o inzerát. Kočík je v Žiline na Hlinách pripravený k prehliadke a odberu.</p>
+            <span class="text-[9px] text-slate-400 block text-right">Dnes 14:10</span>
+          </div>
+        </div>
+
+        <!-- Buyer Message 1 (Tomáš) -->
+        <div class="flex items-start justify-end space-x-2 ml-auto max-w-[85%]">
+          <div class="bg-blue-600 text-white rounded-2xl rounded-tr-none p-3 shadow-sm space-y-1">
+            <p>Dobrý deň pani Zuzana, bolo by možné osobné stretnutie v Žiline cez víkend? Mám vážny záujem.</p>
+            <span class="text-[9px] text-blue-200 block text-right">Dnes 14:12 • Prečítané</span>
+          </div>
+        </div>
+
+        <!-- Seller Message 2 -->
+        <div class="flex items-start space-x-2 max-w-[85%]">
+          <div class="w-7 h-7 rounded-lg bg-pink-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0">ZM</div>
+          <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 shadow-sm text-slate-800 space-y-1">
+            <p>Áno, v sobotu dopoludnia okolo 10:00 by to bolo skvelé. Môžete si kočík v kľude vyskúšať a predvediem vám aj skladanie podvozku.</p>
+            <span class="text-[9px] text-slate-400 block text-right">Dnes 14:15</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Suggestion Reply Chips -->
+      <div class="px-4 py-2 bg-white border-t border-slate-100 flex flex-wrap gap-1.5 text-[11px]">
+        <button onclick="sendSuggestedReply('Sobota o 10:00 mi vyhovuje!')" class="bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 px-2.5 py-1 rounded-full transition cursor-pointer">
+          „Sobota o 10:00 mi vyhovuje!“
+        </button>
+        <button onclick="sendSuggestedReply('Je v cene aj vajíčko do auta?')" class="bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 px-2.5 py-1 rounded-full transition cursor-pointer">
+          „Je v cene aj vajíčko do auta?“
+        </button>
+        <button onclick="sendSuggestedReply('Ponúkam 420 € pri rýchlom odbere.')" class="bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-700 px-2.5 py-1 rounded-full transition cursor-pointer">
+          „Ponúkam 420 € pri rýchlom odbere.“
+        </button>
+      </div>
+
+      <!-- Chat Input Field -->
+      <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+        <input id="chat-input" type="text" placeholder="Napíšte správu predajcovi..." 
+               onkeydown="if(event.key==='Enter') sendMessage()"
+               class="flex-1 py-2.5 px-3.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-600">
+        
+        <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 px-4 rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm transition cursor-pointer">
+          <span>Odoslať</span>
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- 4. FOOTER -->
+  <footer class="bg-slate-900 text-white text-xs mt-12 py-10 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
+            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+          </div>
+          <span class="text-lg font-black">Bazárik<span class="text-blue-400">.sk</span></span>
+        </div>
+        <p class="text-slate-400 leading-relaxed text-xs">
+          Moderná občianska inzercia 2. generácie. Zabezpečená proti phishingu, s podporou GPS vyhľadávania a štruktúrovaných kategórií.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 uppercase tracking-wider mb-3 text-[11px]">Bezpečnosť a pravidlá</h4>
+        <ul class="space-y-2 text-slate-400">
+          <li><a href="#" class="hover:text-white">Chránený in-app chat</a></li>
+          <li><a href="#" class="hover:text-white">Overenie cez SMS a BankID</a></li>
+          <li><a href="#" class="hover:text-white">Prevencia podvodov (Anti-phishing)</a></li>
+          <li><a href="#" class="hover:text-white">Obchodné podmienky</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 uppercase tracking-wider mb-3 text-[11px]">Kategórie a vyhľadávanie</h4>
+        <ul class="space-y-2 text-slate-400">
+          <li><a href="#" class="hover:text-white">Darujem za odvoz (0 €)</a></li>
+          <li><a href="#" class="hover:text-white">Mlynská dolina a okolie</a></li>
+          <li><a href="#" class="hover:text-white">Žilina a okolie</a></li>
+          <li><a href="#" class="hover:text-white">Mobilná aplikácia Bazárik</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 uppercase tracking-wider mb-3 text-[11px]">Akademický projekt</h4>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Webové aplikácie v praxi (1-AIN-168/26)<br>
+          Cvičenie č. 5 — Moderné trendy<br>
+          <strong>Samuel Konkoľ</strong>, 3. ročník AIN, FMFI UK Bratislava
+        </p>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-slate-800 text-center text-slate-500 text-[11px]">
+      © 2026 Bazárik.sk • Projekt A: Občianska inzercia (Informačná architektúra & Prototyp)
+    </div>
+  </footer>
+
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Routing State
+    function navigateTo(viewId) {
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-detail-cybex').classList.add('hidden');
+      document.getElementById('view-detail-stol').classList.add('hidden');
+
+      if (viewId === 'home') {
+        document.getElementById('view-home').classList.remove('hidden');
+        window.location.hash = 'home';
+      } else if (viewId === 'detail-cybex') {
+        document.getElementById('view-detail-cybex').classList.remove('hidden');
+        window.location.hash = 'detail-cybex';
+      } else if (viewId === 'detail-stol') {
+        document.getElementById('view-detail-stol').classList.remove('hidden');
+        window.location.hash = 'detail-stol';
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Handle hash on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'detail-cybex' || hash === 'detail-stol') {
+        navigateTo(hash);
+      } else {
+        navigateTo('home');
+      }
+    });
+
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'detail-cybex' || hash === 'detail-stol') {
+        navigateTo(hash);
+      } else {
+        navigateTo('home');
+      }
+    });
+
+    // GPS Dropdown toggle
+    function toggleGpsDropdown() {
+      const dd = document.getElementById('gps-dropdown');
+      dd.classList.toggle('hidden');
+    }
+
+    function setLocation(name, radius) {
+      const text = radius > 0 ? `${name} +${radius} km` : name;
+      document.getElementById('selected-location-text').innerText = text;
+      toggleGpsDropdown();
+      alert(`Poloha aktualizovaná na: ${text}. Inzeráty v okruhu boli prepočítané.`);
+    }
+
+    // Quick filter toggling
+    let activeFilters = {
+      gps: true,
+      darujem: false,
+      overeni: false,
+      kurier: false,
+      nove: false
+    };
+
+    function toggleFilter(type) {
+      activeFilters[type] = !activeFilters[type];
+      const btn = document.getElementById(`btn-filter-${type}`);
+      if (activeFilters[type]) {
+        btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+        btn.classList.remove('bg-white', 'text-slate-700', 'border-slate-200');
+      } else {
+        btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+        btn.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+      }
+      applyFilterLogic();
+    }
+
+    function filterByCategory(catName) {
+      if (catName === 'all') {
+        resetFilters();
+        return;
+      }
+      const cards = document.querySelectorAll('.listing-card');
+      let count = 0;
+      cards.forEach(card => {
+        const cCat = card.getAttribute('data-category');
+        const cPrice = parseInt(card.getAttribute('data-price') || '1');
+        if (catName === 'Darujem za odvoz') {
+          if (cPrice === 0) {
+            card.style.display = 'flex';
+            count++;
+          } else {
+            card.style.display = 'none';
+          }
+        } else if (cCat.toLowerCase().includes(catName.toLowerCase())) {
+          card.style.display = 'flex';
+          count++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      document.getElementById('result-count-text').innerText = `${count} aktívnych inzerátov v kategórii ${catName}`;
+      document.getElementById('btn-reset-filters').classList.remove('hidden');
+    }
+
+    function handleSearch(query) {
+      const q = query.toLowerCase().trim();
+      const cards = document.querySelectorAll('.listing-card');
+      let count = 0;
+      cards.forEach(card => {
+        const title = card.getAttribute('data-title').toLowerCase();
+        const cat = card.getAttribute('data-category').toLowerCase();
+        if (title.includes(q) || cat.includes(q)) {
+          card.style.display = 'flex';
+          count++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      document.getElementById('result-count-text').innerText = `${count} výsledkov pre "${query}"`;
+      if (query.length > 0) {
+        document.getElementById('btn-reset-filters').classList.remove('hidden');
+      }
+    }
+
+    function applyFilterLogic() {
+      const cards = document.querySelectorAll('.listing-card');
+      let count = 0;
+      cards.forEach(card => {
+        let show = true;
+        const price = parseInt(card.getAttribute('data-price') || '0');
+        const condition = card.getAttribute('data-condition');
+        
+        if (activeFilters.darujem && price !== 0) show = false;
+        if (activeFilters.nove && !condition.includes('Ako nový') && !condition.includes('Nové')) show = false;
+        
+        if (show) {
+          card.style.display = 'flex';
+          count++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      document.getElementById('result-count-text').innerText = `${count} aktívnych inzerátov`;
+      document.getElementById('btn-reset-filters').classList.remove('hidden');
+    }
+
+    function resetFilters() {
+      activeFilters = { gps: false, darujem: false, overeni: false, kurier: false, nove: false };
+      document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+        btn.classList.add('bg-white', 'text-slate-700', 'border-slate-200');
+      });
+      document.querySelectorAll('.listing-card').forEach(c => c.style.display = 'flex');
+      document.getElementById('result-count-text').innerText = '12 aktívnych inzerátov';
+      document.getElementById('btn-reset-filters').classList.add('hidden');
+      document.getElementById('main-search-input').value = '';
+    }
+
+    function handleSort(criteria) {
+      alert(`Zoradenie zmenené na: ${criteria}. Ponuky v rádiuse boli prepočítané.`);
+    }
+
+    // In-App Chat Modal Functions
+    function openChatModal(type) {
+      const modal = document.getElementById('chat-modal');
+      const sellerTitle = document.getElementById('chat-seller-name');
+      const itemTitle = document.getElementById('chat-item-title');
+      const avatar = document.getElementById('chat-avatar');
+
+      if (type === 'stol') {
+        sellerTitle.innerText = 'Peter K. (Overený)';
+        itemTitle.innerText = 'Písací stôl z masívu za odvoz (0 €)';
+        avatar.innerText = 'PK';
+        avatar.className = 'w-10 h-10 rounded-xl bg-slate-800 text-white font-bold flex items-center justify-center text-sm shadow-sm';
+      } else {
+        sellerTitle.innerText = 'Zuzana M. (Overená)';
+        itemTitle.innerText = 'Kombinovaný kočík Cybex Priam 3v1 (450 €)';
+        avatar.innerText = 'ZM';
+        avatar.className = 'w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm';
+      }
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        const input = document.getElementById('chat-input');
+        input.focus();
+      }, 100);
+    }
+
+    function closeChatModal() {
+      document.getElementById('chat-modal').classList.add('hidden');
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'buyer');
+      input.value = '';
+
+      // Simulate seller reply after 800ms
+      setTimeout(() => {
+        appendMessage('Ďakujem za správu! Platí, teším sa na stretnutie. Adresu vám upresním v súkromnej správe.', 'seller');
+      }, 800);
+    }
+
+    function sendSuggestedReply(text) {
+      appendMessage(text, 'buyer');
+      setTimeout(() => {
+        appendMessage('Výborne! Počítam s tým. Budem doma pripravená.', 'seller');
+      }, 800);
+    }
+
+    function appendMessage(text, sender) {
+      const container = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      
+      const now = new Date();
+      const timeStr = `${now.getHours()}:${now.getMinutes() < 10 ? '0' : ''}${now.getMinutes()}`;
+
+      if (sender === 'buyer') {
+        msgDiv.className = 'flex items-start justify-end space-x-2 ml-auto max-w-[85%]';
+        msgDiv.innerHTML = `
+          <div class="bg-blue-600 text-white rounded-2xl rounded-tr-none p-3 shadow-sm space-y-1">
+            <p>${text}</p>
+            <span class="text-[9px] text-blue-200 block text-right">${timeStr} • Odoslané</span>
+          </div>
+        `;
+      } else {
+        msgDiv.className = 'flex items-start space-x-2 max-w-[85%]';
+        msgDiv.innerHTML = `
+          <div class="w-7 h-7 rounded-lg bg-pink-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0">ZM</div>
+          <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-3 shadow-sm text-slate-800 space-y-1">
+            <p>${text}</p>
+            <span class="text-[9px] text-slate-400 block text-right">${timeStr}</span>
+          </div>
+        `;
+      }
+
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+    function revealPhone() {
+      const btn = document.getElementById('btn-show-phone');
+      const txt = document.getElementById('phone-text');
+      txt.innerHTML = '<strong>+421 948 ••• •••</strong> (Chránené: Spojenie cez ústredňu)';
+      btn.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-300');
+      alert('Z dôvodu ochrany pred phishingom a WhatsApp podvodmi je skutočné číslo skryté. Váš hovor bude bezplatne presmerovaný cez chránenú bránu Bazárika.');
+    }
+
+    function openSafetyModal() {
+      alert('🛡️ Bezpečný nákup na Bazáriku:\n\n1. Telefónne čísla nie sú verejne zverejnené - chránime vás pred phishingovými robotmi.\n2. Každý predajca je overený SMS kódom alebo BankID.\n3. Obojstranné hodnotenia budujú skutočnú dôveryhodnosť.\n4. Odporúčame osobný odber v okruhu GPS.');
+    }
+  </script>
+</body>
+</html>
